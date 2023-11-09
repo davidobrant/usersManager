@@ -1,4 +1,6 @@
-package org.example;
+package org.example.utils;
+
+import org.example.utils.Colors;
 
 import java.util.HashMap;
 
@@ -20,32 +22,19 @@ public class Formatter {
         return "\n" + setColor("black","white_bg",prefix + title + suffix);
     }
     public String menu2(String title) {
-        prefix = " #### ";
-        suffix = " #### ";
-        return "\n" + setColor("black","white_bg",prefix + title + suffix);
-    }
-    public String menu3(String title) {
         prefix = " ### ";
         suffix = " ### ";
         return "\n" + setColor("black","white_bg",prefix + title + suffix);
     }
-    public String heading1(String heading) {
-        prefix = "_____";
-        suffix = "_____";
-        return "\n" + prefix + heading + suffix;
+    public String menu3(String title) {
+        prefix = " # ";
+        suffix = " # ";
+        return "\n" + setColor("black","white_bg",prefix + title + suffix);
     }
-    public String heading1(String heading, String description) {
-        prefix = "_____";
-        suffix = "_____";
-        separator = " - ";
-        return "\n" + prefix + heading + suffix + separator + description;
-    }
-    public String heading1(String heading, String description, boolean reversed) {
-        prefix = "_____";
-        suffix = "_____";
-        separator = " - ";
+    public String description(String description, boolean reversed) {
+        separator = " ";
         String order = reversed ? " (descending)" : " (ascending)";
-        return "\n" + prefix + heading + suffix + separator + description + order;
+        return separator + description + order;
     }
     public String setColor(String color, String string) {
         return colors.get(color.toUpperCase()) + string + colors.get("RESET");

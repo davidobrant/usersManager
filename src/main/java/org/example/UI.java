@@ -1,8 +1,11 @@
 package org.example;
 
+import org.example.utils.App;
+import org.example.utils.MockData;
+import org.example.utils.Printer;
+
 import java.sql.Date;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 public class UI {
     App app = new App();
@@ -11,6 +14,7 @@ public class UI {
 
     public void run() throws SQLException {
         db = new Database();
+        new MockData();
         mainMenu();
     }
 
@@ -24,6 +28,7 @@ public class UI {
                 (3) Add user
                 (4) Update user
                 (5) Delete user
+                (6) Delete All
                 (0) Exit program""");
             handleMainMenu(p.promptCommand());
         }
@@ -60,6 +65,11 @@ public class UI {
                 deleteMenu();
                 break;
             }
+            case "6":
+            case "deleteall": {
+                deleteAllMenu();
+                break;
+            }
             default: {
                 p.printInvalidCommand();
                 break;
@@ -94,33 +104,33 @@ public class UI {
                 break;
             }
             case "1": {
-                p.printHeading1("Users", "sorted by ID", reversed);
-                p.printUserList(userList.sortById(), reversed);
+                p.printMenu3("USERS", "sorted by 'ID'", reversed);
+                p.printUsers(userList.sortById(), reversed);
                 break;
             }
             case "2": {
-                p.printHeading1("Users", "sorted by First name", reversed);
-                p.printUserList(userList.sortByFirstname(), reversed);
+                p.printMenu3("USERS", "sorted by 'First name'", reversed);
+                p.printUsers(userList.sortByFirstname(), reversed);
                 break;
             }
             case "3": {
-                p.printHeading1("Users", "sorted by Last name", reversed);
-                p.printUserList(userList.sortByLastname(), reversed);
+                p.printMenu3("USERS", "sorted by 'Last name'", reversed);
+                p.printUsers(userList.sortByLastname(), reversed);
                 break;
             }
             case "4": {
-                p.printHeading1("Users", "sorted by Date of birth", reversed);
-                p.printUserList(userList.sortByDateOfBirth(), reversed);
+                p.printMenu3("USERS", "sorted by 'Date of birth'", reversed);
+                p.printUsers(userList.sortByDateOfBirth(), reversed);
                 break;
             }
             case "5": {
-                p.printHeading1("Users", "sorted by Next birthday", reversed);
-                p.printUserList(userList.sortByNextBirthday(), reversed);
+                p.printMenu3("USERS", "sorted by 'Next birthday'", reversed);
+                p.printUsers(userList.sortByNextBirthday(), reversed);
                 break;
             }
             case "6": {
-                p.printHeading1("Users", "sorted by Membership", reversed);
-                p.printUserList(userList.sortByMembership(), reversed);
+                p.printMenu3("USERS", "sorted by 'Membership'", reversed);
+                p.printUsers(userList.sortByMembership(), reversed);
                 break;
             }
             default: {
@@ -157,44 +167,48 @@ public class UI {
             }
             case "1":
             case "id": {
-                int id = p.promptInt("id");
-                p.printMenu3("SEARCH BY ID", " Results for: " + "\""+id+"\"");
-                p.printUserList(userList.searchById(id));
+                int id = p.promptInt("User ID");
+                p.printMenu3("SEARCH BY ID", " Results for: \"" + id + "\"");
+                p.printUsers(userList.searchById(id));
                 break;
             }
             case "2":
             case "firstname": {
                 String firstName = p.promptStringOfChars("First name");
-                p.printHeading1("Users", "search by First name: \"" + firstName + "\"");
-                p.printUserList(userList.searchByFirstName(firstName));
+                p.printMenu3("SEARCH BY FIRSTNAME", " Results for: \"" + firstName + "\"");
+                p.printUsers(userList.searchByFirstName(firstName));
                 break;
             }
             case "3":
             case "lastname": {
                 String lastName = p.promptStringOfChars("Last name");
-                p.printHeading1("Users", "search by Last name: \"" + lastName + "\"");
-                p.printUserList(userList.searchByLastName(lastName));
+                p.printMenu3("SEARCH BY LASTNAME", " Results for: \"" + lastName + "\"");
+                p.printUsers(userList.searchByLastName(lastName));
                 break;
             }
             case "4":
             case "email": {
                 String email = p.prompt("Email");
-                p.printHeading1("Users", "search by Last name: \"" + email + "\"");
-                p.printUserList(userList.searchByEmail(email));
+                p.printMenu3("SEARCH BY EMAIL", " Results for: \"" + email + "\"");
+                p.printUsers(userList.searchByEmail(email));
                 break;
             }
             case "5":
             case "birthdate": {
                 Date date = p.promptDate("Date of birth", "yyyyMMdd");
-                p.printHeading1("Users", "search by Last name: \"" + date + "\"");
-                p.printUserList(userList.searchByDateOfBirth(date));
+                boolean beforeOrAfter = p.promptBeforeOrAfter(date);
+                String beforeOrAfterString = beforeOrAfter ? "before" : "after";
+                p.printMenu3("SEARCH BY BIRTHDATE", " Results for: \"" + beforeOrAfterString + " " + date + "\"");
+                p.printUsers(userList.searchByDateOfBirth(date, beforeOrAfter));
                 break;
             }
             case "6":
             case "membership": {
                 Date date = p.promptDate("Membership", "yyyyMMdd");
-                p.printHeading1("Users", "search by Membership: \"" + date + "\"");
-                p.printUserList(userList.searchByMembership(date));
+                boolean beforeOrAfter = p.promptBeforeOrAfter(date);
+                String beforeOrAfterString = beforeOrAfter ? "before" : "after";
+                p.printMenu3("SEARCH BY MEMBERSHIP", " Results for: \"" + beforeOrAfterString + " " + date + "\"");
+                p.printUsers(userList.searchByMembership(date, beforeOrAfter));
                 break;
             }
             default: {
@@ -227,7 +241,7 @@ public class UI {
             p.printAction("Creating user... ");
             boolean res = db.addUser(newUser);
             if (!res) throw new SQLException("User not created.");
-            p.printSuccess("Success! ");
+            p.printSuccess("Done! ");
         } catch (SQLException e) {
             p.printDanger("Failed! ");
             if (e.getMessage().equals("[SQLITE_CONSTRAINT_UNIQUE] A UNIQUE constraint failed (UNIQUE constraint failed: users.email)")) {
@@ -242,12 +256,12 @@ public class UI {
     /* ----- UPDATE MENU ----- */
     private void updateMenu() throws SQLException {
         p.printMenu2("UPDATE MENU");
+        User user = selectUserByIdPrompt();
+        if (user == null) return;
         app.runMenu();
-        int id = selectUserById();
         while (app.menuIsRunning()) {
-            var user = db.getUserById(id);
             p.printUser(user);
-            p.printMenu3("USER ID: " + id);
+            p.printMenu3("USER ID: " + user.getId());
             System.out.println("""
                 Update information:
                 (1) First name\s
@@ -301,27 +315,28 @@ public class UI {
             }
         }
     }
-    private int selectUserById() {
+    private User selectUserByIdPrompt() {
         int id = p.promptInt("User ID");
         try {
             User user = db.getUserById(id);
             if (user.getId() == 0) throw new SQLException("No user with id: "+id+" found.");
+            return user;
         } catch (SQLException e) {
             p.printWarning(e.getMessage());
-            if (p.promptYesOrNo("Try another ID?")) selectUserById();
-            app.exitMenu();
-            return -1;
+            if (p.promptYesOrNo("Try another ID?")) selectUserByIdPrompt();
+            return null;
         }
-        return id;
     }
     private void updateUser(User user) {
         try {
             p.printAction("Updating user... ");
             if (!db.updateUser(user)) throw new SQLException("An error occurred while updating user.");
-            p.printSuccess("Success!");
+            p.printSuccess("Done! ");
         } catch (SQLException e) {
             p.printDanger("Failed. ");
-            p.printWarning(e.getMessage());
+            if (e.getMessage().equals("[SQLITE_CONSTRAINT_UNIQUE] A UNIQUE constraint failed (UNIQUE constraint failed: users.email)")) {
+                p.printWarning("Email already exists.");
+            } else p.printWarning(e.getMessage());
         }
     }
     /* --x-- UPDATE MENU --x-- */
@@ -337,19 +352,19 @@ public class UI {
     private void deleteUser() {
         int id = p.promptInt("User ID");
         try {
-            printUserToDeletedById(id);
+            printUserToDeleteById(id);
             if (!p.promptYesOrNo("Delete user?")) return;
             p.printAction("Deleting user... ");
             boolean res = db.deleteUser(id);
             if (!res) throw new SQLException("No user with id: "+id+" found.");
-            p.printSuccess("Success! User (id: "+id+") deleted.");
+            p.printSuccess("Done! ");
         } catch (SQLException e) {
             p.printDanger("Failed! ");
             p.printWarning(e.getMessage());
         }
         if (p.promptYesOrNo("Delete another user?")) deleteUser();
     }
-    private void printUserToDeletedById(int id) {
+    private void printUserToDeleteById(int id) {
         try {
             User user = db.getUserById(id);
             if (user.getId() == 0) throw new SQLException("No user with id: "+id+" found.");
@@ -360,5 +375,21 @@ public class UI {
         }
     }
     /* --x-- DELETE MENU --x-- */
-
+    /* ----- DELETE ALL MENU ----- */
+    private void deleteAllMenu() {
+        try {
+            if (p.promptDeleteAll()) {
+                p.printAction("Purging db... ");
+                db.deleteAllUsers();
+                p.printSuccess("Done!");
+            } else {
+                p.printWarning("\nNo action taken.");
+                p.printInfo("\nReturning... ");
+            }
+        } catch (SQLException e) {
+            p.printDanger("Failed!");
+            p.printWarning("Something went wrong.");
+        }
+    }
+    /* --x-- DELETE ALL MENU --x-- */
 }

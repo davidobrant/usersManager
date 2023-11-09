@@ -25,6 +25,11 @@ public class Database {
         stmt.execute(sql);
     }
 
+    public void deleteAllUsers() throws SQLException {
+        Statement stmt = connection.createStatement();
+        stmt.execute("DELETE FROM users");
+    }
+
     public boolean addUser(User user) throws SQLException {
         String sql = "INSERT INTO users (firstName, lastName, email, dateOfBirth, createdAt) VALUES(?,?,?,?,?)";
         PreparedStatement pstmt = connection.prepareStatement(sql);

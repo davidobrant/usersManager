@@ -10,48 +10,87 @@ This is an example application for trying out CRUD-operations with Sqlite-databa
 
 > When starting the project a database file name `users.db` will be created if not already exists.
 
+> If `users.db` is empty the program will offer to populate file with mock-data. 
+
 ## Project structure
 
 ### `Main.java`
 
-This file is the entrypoint and will call the database to manage users.
+This file is the entrypoint and will create a new instance of the `UI.java` class (user interface) and call `UI.run()`.
+
+### `UI.java`
+
+This file contains the User-Interface with menus and handling of commands from user in console.
 Here is where all the operations are executed.
 
 ### `Database.java`
 
 This file creates and connects the database. Contains all methods for CRUD-operations.
 
-### `UI.java`
-
-This file contains the User-Interface with menus and handling of commands from user in console.
-
 ### `User.java`
 
-This is the model class for a user.
+This is the model class for a user with two kinds of constructors and getters/setters for user information. 
 
-### `Utils.java`
+### `UserList.java`
 
-This file contains all the helper-methods that is used throughout project.
+This is the model class for lists of users. File contains the logic for sorting and search users.
+
+## utils
+
+>This folder contains all the helper files and methods that is used throughout project. 
+
+### `App.java`
+
+Contains variables and methods for starting and exiting the program as well as the different menus.
+
+### `Printer.java` 
+
+This file contains methods for handling what is printed out and also what is received from user input via console. 
+(methods to print or prompt).
+
+### `Formatter.java`
+
+This file is simply formatting and returning various strings that is to be printed. 
+To gather all methods in one place makes it easier to change the appearance.
+
+### `Colors.java`
+
+This file with return a `HashMap<color, color_code>` to be used is wanting to color text or menus.
+
+### `Table.java`
+
+File will method for printing users in a tableview when presenting lists or search results of users.
+
+### `Utilities.java`
+
+File contains other "helper methods" for example validating or creating a `java.sql.Date Object`.
+
+### `MockData.java`
+
+Contains method for populating database with mock-users.
 
 
-## Image demo
+## Images of Program
 
-How to add image `![alt test](/assets/DEMO.png)`.
+**MAIN MENU**
 
-**DEMO**
-
-![alt test](/assets/DEMO.png)
-
-
-## Ex...
-
-[Link text](https://example.com)
+![alt test](/assets/main_menu.png)
 
 
 
 ## Instructions for Linux
 
-...
+> To run Java on Linux first make sure to have Java Development Kit (JDK) installed.
+Check by command `java --version` in terminal. 
+> [Instructions for Ubuntu](https://ubuntu.com/tutorials/install-jre#1-overview)
+
+Start in root directory for project.
+
+1. Navigate to package directory `cd src/main/java/org.example/`.
+2. Run command `javac Main.java` to compile `*.java` files into `*.class`. 
+3. Run command `java Main` to run `Main.class`.
+
+Program will now start.
 
 
 ## Clean code
@@ -67,3 +106,11 @@ public static void main(String[] args) {
     System.out.println("demo");
 }
 ```
+UserList
+In List- and Search-menus we only fetch users once and use the UserList class to sort or filter the results. 
+This method prevents program from making too many requests to the database.
+
+KISS
+
+DRY
+

@@ -1,9 +1,10 @@
-package org.example;
+package org.example.utils;
 
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 
 public class Utilities {
@@ -61,4 +62,5 @@ public class Utilities {
     public String getMMddString(Date date) {
         return date.toString().replace("-", "").substring(4, 8);
     }
+
 }

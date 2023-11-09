@@ -1,6 +1,6 @@
-package org.example;
+package org.example.utils;
 
-import org.w3c.dom.ls.LSOutput;
+import org.example.User;
 
 import java.sql.Date;
 import java.text.ParseException;
@@ -11,16 +11,11 @@ import java.util.Scanner;
 public class Printer {
     Formatter f = new Formatter();
     Utilities u = new Utilities();
+    Table t = new Table();
     Scanner scanner = new Scanner(System.in);
 
 
     /* ----- PRINT ----- */
-    public void print(String string) {
-        System.out.println(string);
-    }
-    public void print(int i) {
-        System.out.println(Integer.toString(i));
-    }
     public void printMenu1(String string) {
         System.out.println(f.menu1(string));
     }
@@ -33,15 +28,8 @@ public class Printer {
     public void printMenu3(String title, String description) {
         System.out.println(f.menu3(title) + description);
     }
-
-    public void printHeading1(String string) {
-        System.out.println(f.heading1(string));
-    }
-    public void printHeading1(String heading, String description) {
-        System.out.println(f.heading1(heading, description));
-    }
-    public void printHeading1(String heading, String description, boolean reversed) {
-        printInfo(f.heading1(heading, description, reversed));
+    public void printMenu3(String title, String description, boolean reversed) {
+        System.out.println(f.menu3(title) + f.description(description, reversed));
     }
     public void printAction(String string) {
         System.out.print("\n" + string);
@@ -77,28 +65,21 @@ public class Printer {
                 "Member since: " + user.getCreatedAt()
         );
     }
-    public void printUserList(ArrayList<User> users) {
-        users.forEach(System.out::println);
+    public void printUsers(ArrayList<User> users) {
+        if (users.isEmpty()) printNoUsersMessage();
+        else t.printUsersInTableView(users);
         promptEnterKey();
     }
-    public void printUserList(ArrayList<User> users, boolean reversed) {
-        if (reversed) users.reversed().forEach(System.out::println);
-        else users.forEach(System.out::println);
+    public void printUsers(ArrayList<User> users, boolean reversed) {
+        if (users.isEmpty()) printNoUsersMessage();
+        else {
+            if (reversed) t.printUsersInTableView(new ArrayList<>(users.reversed()));
+            else t.printUsersInTableView(users);
+        }
         promptEnterKey();
     }
-    private void printUserListInTableView(ArrayList<User> users) {
-        String leftAlignFormat = "| %-15s | %-4d |%n";
-
-        System.out.format("+-----------------+------+%n");
-        System.out.format("| ID              | ID   |%n");
-        System.out.format("+-----------------+------+%n");
-        for (int i = 0; i < 5; i++) {
-            System.out.format(leftAlignFormat, "some data" + i, i * i);
-        }
-        System.out.format("+-----------------+------+%n");
-        for (User user : users) {
-            System.out.println(user);
-        }
+    private void printNoUsersMessage() {
+        printInfo("\nNo users found...");
     }
     /* --x-- PRINT --x-- */
     /* ----- PROMPT ----- */
@@ -155,6 +136,11 @@ public class Printer {
             return promptDate(string, format);
         }
     }
+    public boolean promptBeforeOrAfter(Date date) {
+        System.out.print(f.prompt("search for results BEFORE or AFTER \"" + date.toString() + "\"? (before/after)"));
+        String res = scanner.next();
+        return res.startsWith("b");
+    }
     public int promptInt(String string) {
         try {
             System.out.print(f.prompt(string));
@@ -167,7 +153,7 @@ public class Printer {
     }
     public String promptCommand() {
         System.out.print(f.prompt("command"));
-        return scanner.next().trim().toLowerCase();
+        return scanner.next().toLowerCase();
     }
     /**
      * Prompts user to continue on "ENTER"
@@ -180,20 +166,21 @@ public class Printer {
     }
     /**
      * Prompts user to 'Continue? (Y/n)'
-     * Will continue on "ENTER"
+     * Will not continue on "ENTER"
      * @return boolean true for yes, false for no
      */
     public boolean promptYesOrNo(){
         System.out.println("\n" + f.setColor("blue","> Continue? (Y/n): "));
-        String cmd = scanner.nextLine();
-        scanner.nextLine();
-        return cmd.equals("yes") || cmd.equals("y") || cmd.isEmpty();
+        String cmd = scanner.nextLine().toLowerCase();
+        return cmd.startsWith("y") || cmd.isEmpty();
     }
     public boolean promptYesOrNo(String string){
-        System.out.print("\n" + f.setColor("blue", "> " + string + " (Y/n): "));
-        String cmd = scanner.next().trim().toLowerCase();
-        return cmd.equals("yes") || cmd.equals("y");
+        System.out.print("\n" + f.setColor("blue", "> " + string + " (y/n): "));
+        return scanner.next().startsWith("y");
+    }
+    public boolean promptDeleteAll() {
+        System.out.print("\n" + f.setColor("yellow", "DELETE ALL USERS? (irreversible)") + f.setColor("red","\n> Enter \"Deleteall\": "));
+        return scanner.next().equalsIgnoreCase("deleteall");
     }
     /* --x-- PROMPT --x-- */
-
 }
