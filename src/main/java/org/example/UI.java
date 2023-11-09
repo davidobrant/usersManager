@@ -21,7 +21,7 @@ public class UI {
     /* ----- MAIN MENU ----- */
     private void mainMenu() throws SQLException {
         while (app.runMain()) {
-            p.printMenu1("MAIN MENU");
+            p.printMainMenu("MAIN MENU");
             System.out.println("""
                 (1) List users\s
                 (2) Search users
@@ -81,7 +81,7 @@ public class UI {
     private void listMenu() throws SQLException {
         app.runMenu();
         while (app.menuIsRunning()) {
-            p.printMenu2("LIST MENU");
+            p.printSubMenu("LIST MENU");
             System.out.println("""
                 List users ordered by:
                 (1) ID\s
@@ -104,32 +104,32 @@ public class UI {
                 break;
             }
             case "1": {
-                p.printMenu3("USERS", "sorted by 'ID'", reversed);
+                p.printHeading("USERS", "sorted by 'ID'", reversed);
                 p.printUsers(userList.sortById(), reversed);
                 break;
             }
             case "2": {
-                p.printMenu3("USERS", "sorted by 'First name'", reversed);
+                p.printHeading("USERS", "sorted by 'First name'", reversed);
                 p.printUsers(userList.sortByFirstname(), reversed);
                 break;
             }
             case "3": {
-                p.printMenu3("USERS", "sorted by 'Last name'", reversed);
+                p.printHeading("USERS", "sorted by 'Last name'", reversed);
                 p.printUsers(userList.sortByLastname(), reversed);
                 break;
             }
             case "4": {
-                p.printMenu3("USERS", "sorted by 'Date of birth'", reversed);
+                p.printHeading("USERS", "sorted by 'Date of birth'", reversed);
                 p.printUsers(userList.sortByDateOfBirth(), reversed);
                 break;
             }
             case "5": {
-                p.printMenu3("USERS", "sorted by 'Next birthday'", reversed);
+                p.printHeading("USERS", "sorted by 'Next birthday'", reversed);
                 p.printUsers(userList.sortByNextBirthday(), reversed);
                 break;
             }
             case "6": {
-                p.printMenu3("USERS", "sorted by 'Membership'", reversed);
+                p.printHeading("USERS", "sorted by 'Membership'", reversed);
                 p.printUsers(userList.sortByMembership(), reversed);
                 break;
             }
@@ -144,7 +144,7 @@ public class UI {
     private void searchMenu() throws SQLException {
         app.runMenu();
         while (app.menuIsRunning()) {
-            p.printMenu2("SEARCH MENU");
+            p.printSubMenu("SEARCH MENU");
             System.out.println("""
                 Search users by:\s
                 (1) ID
@@ -168,28 +168,28 @@ public class UI {
             case "1":
             case "id": {
                 int id = p.promptInt("User ID");
-                p.printMenu3("SEARCH BY ID", " Results for: \"" + id + "\"");
+                p.printHeading("SEARCH BY ID", " Results for: \"" + id + "\"");
                 p.printUsers(userList.searchById(id));
                 break;
             }
             case "2":
             case "firstname": {
                 String firstName = p.promptStringOfChars("First name");
-                p.printMenu3("SEARCH BY FIRSTNAME", " Results for: \"" + firstName + "\"");
+                p.printHeading("SEARCH BY FIRSTNAME", " Results for: \"" + firstName + "\"");
                 p.printUsers(userList.searchByFirstName(firstName));
                 break;
             }
             case "3":
             case "lastname": {
                 String lastName = p.promptStringOfChars("Last name");
-                p.printMenu3("SEARCH BY LASTNAME", " Results for: \"" + lastName + "\"");
+                p.printHeading("SEARCH BY LASTNAME", " Results for: \"" + lastName + "\"");
                 p.printUsers(userList.searchByLastName(lastName));
                 break;
             }
             case "4":
             case "email": {
                 String email = p.prompt("Email");
-                p.printMenu3("SEARCH BY EMAIL", " Results for: \"" + email + "\"");
+                p.printHeading("SEARCH BY EMAIL", " Results for: \"" + email + "\"");
                 p.printUsers(userList.searchByEmail(email));
                 break;
             }
@@ -198,7 +198,7 @@ public class UI {
                 Date date = p.promptDate("Date of birth", "yyyyMMdd");
                 boolean beforeOrAfter = p.promptBeforeOrAfter(date);
                 String beforeOrAfterString = beforeOrAfter ? "before" : "after";
-                p.printMenu3("SEARCH BY BIRTHDATE", " Results for: \"" + beforeOrAfterString + " " + date + "\"");
+                p.printHeading("SEARCH BY BIRTHDATE", " Results for: \"" + beforeOrAfterString + " " + date + "\"");
                 p.printUsers(userList.searchByDateOfBirth(date, beforeOrAfter));
                 break;
             }
@@ -207,7 +207,7 @@ public class UI {
                 Date date = p.promptDate("Membership", "yyyyMMdd");
                 boolean beforeOrAfter = p.promptBeforeOrAfter(date);
                 String beforeOrAfterString = beforeOrAfter ? "before" : "after";
-                p.printMenu3("SEARCH BY MEMBERSHIP", " Results for: \"" + beforeOrAfterString + " " + date + "\"");
+                p.printHeading("SEARCH BY MEMBERSHIP", " Results for: \"" + beforeOrAfterString + " " + date + "\"");
                 p.printUsers(userList.searchByMembership(date, beforeOrAfter));
                 break;
             }
@@ -222,7 +222,7 @@ public class UI {
     private void addMenu() {
         app.runMenu();
         while (app.menuIsRunning()) {
-            p.printMenu2("ADD MENU");
+            p.printSubMenu("ADD MENU");
             addUserForm();
             app.exitMenu();
         }
@@ -236,7 +236,10 @@ public class UI {
     }
     private void addUser(User newUser) {
         p.printNewUser(newUser);
-        if (!p.promptYesOrNo("Create new user?")) app.exitMenu();
+        if (!p.promptYesOrNo("Create new user?")) {
+            if (p.promptYesOrNo("Add another user?")) addUserForm();
+            return;
+        }
         try {
             p.printAction("Creating user... ");
             boolean res = db.addUser(newUser);
@@ -250,18 +253,18 @@ public class UI {
                 p.printWarning(e.getMessage());
             }
         }
-        if (p.promptYesOrNo("Add new user?")) addUserForm();
+        if (p.promptYesOrNo("Add another user?")) addUserForm();
     }
     /* --x-- ADD MENU --x-- */
     /* ----- UPDATE MENU ----- */
     private void updateMenu() throws SQLException {
-        p.printMenu2("UPDATE MENU");
-        User user = selectUserByIdPrompt();
+        p.printSubMenu("UPDATE MENU");
+        User user = selectUser();
         if (user == null) return;
         app.runMenu();
         while (app.menuIsRunning()) {
             p.printUser(user);
-            p.printMenu3("USER ID: " + user.getId());
+            p.printHeading("USER ID: " + user.getId());
             System.out.println("""
                 Update information:
                 (1) First name\s
@@ -315,17 +318,20 @@ public class UI {
             }
         }
     }
-    private User selectUserByIdPrompt() {
+    private User selectUser() {
         int id = p.promptInt("User ID");
         try {
-            User user = db.getUserById(id);
-            if (user.getId() == 0) throw new SQLException("No user with id: "+id+" found.");
-            return user;
+            return getUserById(id);
         } catch (SQLException e) {
             p.printWarning(e.getMessage());
-            if (p.promptYesOrNo("Try another ID?")) selectUserByIdPrompt();
+            if (p.promptYesOrNo("Try another ID?")) selectUser();
             return null;
         }
+    }
+    private User getUserById(int id) throws SQLException {
+        User user = db.getUserById(id);
+        if (user.getId() == 0) throw new SQLException("No user with id: "+id+" found.");
+        return user;
     }
     private void updateUser(User user) {
         try {
@@ -341,10 +347,10 @@ public class UI {
     }
     /* --x-- UPDATE MENU --x-- */
     /* ----- DELETE MENU ----- */
-    private void deleteMenu() throws SQLException {
+    private void deleteMenu() {
         app.runMenu();
         while (app.menuIsRunning()) {
-            p.printMenu2("DELETE MENU");
+            p.printSubMenu("DELETE MENU");
             deleteUser();
             app.exitMenu();
         }
@@ -352,11 +358,10 @@ public class UI {
     private void deleteUser() {
         int id = p.promptInt("User ID");
         try {
-            printUserToDeleteById(id);
+            if (!printUserById(id)) return;
             if (!p.promptYesOrNo("Delete user?")) return;
             p.printAction("Deleting user... ");
-            boolean res = db.deleteUser(id);
-            if (!res) throw new SQLException("No user with id: "+id+" found.");
+            if (!db.deleteUser(id)) throw new SQLException("Could not delete user ID: " + id);
             p.printSuccess("Done! ");
         } catch (SQLException e) {
             p.printDanger("Failed! ");
@@ -364,19 +369,21 @@ public class UI {
         }
         if (p.promptYesOrNo("Delete another user?")) deleteUser();
     }
-    private void printUserToDeleteById(int id) {
+    private boolean printUserById(int id) {
         try {
-            User user = db.getUserById(id);
-            if (user.getId() == 0) throw new SQLException("No user with id: "+id+" found.");
+            User user = getUserById(id);
             p.printUser(user);
+            return true;
         } catch (SQLException e){
             p.printWarning(e.getMessage());
-            deleteUser();
+            if (p.promptYesOrNo("Try another ID?")) deleteUser();
+            return false;
         }
     }
     /* --x-- DELETE MENU --x-- */
     /* ----- DELETE ALL MENU ----- */
     private void deleteAllMenu() {
+        p.printSubMenu("DELETE ALL");
         try {
             if (p.promptDeleteAll()) {
                 p.printAction("Purging db... ");

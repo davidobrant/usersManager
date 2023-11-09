@@ -1,6 +1,5 @@
 package org.example.utils;
 
-import org.example.utils.Colors;
 
 import java.util.HashMap;
 
@@ -11,6 +10,7 @@ public class Formatter {
     private String prefix;
     private String suffix;
     private String separator;
+
     public String prompt(String string) {
         prefix = "> Enter ";
         suffix = ": ";

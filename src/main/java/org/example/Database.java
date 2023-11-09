@@ -25,11 +25,6 @@ public class Database {
         stmt.execute(sql);
     }
 
-    public void deleteAllUsers() throws SQLException {
-        Statement stmt = connection.createStatement();
-        stmt.execute("DELETE FROM users");
-    }
-
     public boolean addUser(User user) throws SQLException {
         String sql = "INSERT INTO users (firstName, lastName, email, dateOfBirth, createdAt) VALUES(?,?,?,?,?)";
         PreparedStatement pstmt = connection.prepareStatement(sql);
@@ -46,13 +41,16 @@ public class Database {
         return executeSelectUsersBySql(sql);
     }
 
-    public ArrayList<User> getUsersSortedBy(String attribute) throws SQLException {
-        String sql = "SELECT * FROM users ORDER BY " + attribute ;
-        return executeSelectUsersBySql(sql);
-    }
-
-    public ArrayList<User> getUsersSortedByDesc(String attribute) throws SQLException {
-        String sql = "SELECT * FROM users ORDER BY " + attribute + " DESC" ;
+    /**
+     * Method for retrieving users sorted by given parameters
+     * @param attribute - The column on which to sort list
+     * @param order - boolean true == ASC, false == DESC
+     * @return ArrayList<Users> - Users in arraylist
+     * @throws SQLException - Throws exception to be handled
+     */
+    public ArrayList<User> getUsersSortedBy(String attribute, boolean order) throws SQLException {
+        String orderString = order ? " ASC" : " DESC";
+        String sql = "SELECT * FROM users ORDER BY " + attribute + orderString ;
         return executeSelectUsersBySql(sql);
     }
 
@@ -90,6 +88,11 @@ public class Database {
         PreparedStatement pstmt = connection.prepareStatement(sql);
         pstmt.setInt(1, id);
         return pstmt.executeUpdate() > 0;
+    }
+
+    public void deleteAllUsers() throws SQLException {
+        Statement stmt = connection.createStatement();
+        stmt.execute("DELETE FROM users");
     }
 
     public User getUserFromResultSet(ResultSet rs) throws SQLException {

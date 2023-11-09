@@ -16,21 +16,22 @@ public class Printer {
 
 
     /* ----- PRINT ----- */
-    public void printMenu1(String string) {
+    public void printMainMenu(String string) {
         System.out.println(f.menu1(string));
     }
-    public void printMenu2(String string) {
+    public void printSubMenu(String string) {
         System.out.println(f.menu2(string));
     }
-    public void printMenu3(String string) {
+    public void printHeading(String string) {
         System.out.println(f.menu3(string));
     }
-    public void printMenu3(String title, String description) {
+    public void printHeading(String title, String description) {
         System.out.println(f.menu3(title) + description);
     }
-    public void printMenu3(String title, String description, boolean reversed) {
+    public void printHeading(String title, String description, boolean reversed) {
         System.out.println(f.menu3(title) + f.description(description, reversed));
     }
+
     public void printAction(String string) {
         System.out.print("\n" + string);
     }
@@ -46,9 +47,11 @@ public class Printer {
     public void printDanger(String string) {
         System.out.println(f.setColor("red", string));
     }
+
     public void printInvalidCommand() {
         printDanger("\nInvalid command...");
     }
+
     public void printNewUser(User user) {
         printInfo("\nFirstname: " + user.getFirstName() + "\t" +
                 "Lastname: " + user.getLastName() + "\t" +
@@ -141,6 +144,14 @@ public class Printer {
         String res = scanner.next();
         return res.startsWith("b");
     }
+
+    /**
+     * Prompts user for parameter named <string> and return the value of input.
+     * Validates that input is of type 'int' and runs again is input not valid.
+     *
+     * @param string - Describing name of requested variable. Ex "User ID".
+     * @return int - The value of input from user.
+     */
     public int promptInt(String string) {
         try {
             System.out.print(f.prompt(string));
@@ -169,17 +180,12 @@ public class Printer {
      * Will not continue on "ENTER"
      * @return boolean true for yes, false for no
      */
-    public boolean promptYesOrNo(){
-        System.out.println("\n" + f.setColor("blue","> Continue? (Y/n): "));
-        String cmd = scanner.nextLine().toLowerCase();
-        return cmd.startsWith("y") || cmd.isEmpty();
-    }
     public boolean promptYesOrNo(String string){
         System.out.print("\n" + f.setColor("blue", "> " + string + " (y/n): "));
         return scanner.next().startsWith("y");
     }
     public boolean promptDeleteAll() {
-        System.out.print("\n" + f.setColor("yellow", "DELETE ALL USERS? (irreversible)") + f.setColor("red","\n> Enter \"Deleteall\": "));
+        System.out.print("\n" + f.setColor("yellow", "DELETE ALL USERS? (irreversible)") + f.setColor("red","\n> Enter \"deleteall\": "));
         return scanner.next().equalsIgnoreCase("deleteall");
     }
     /* --x-- PROMPT --x-- */
