@@ -74,11 +74,11 @@ Contains method for populating database with mock-users.
 
 **MAIN MENU**
 
-![alt test](/assets/main_menu.png)
+![alt test](../assets/main_menu.png)
 
 **SUB MENU**
 
-![alt test](/assets/sub_menu.png)
+![alt test](../assets/sub_menu.png)
 
 
 
